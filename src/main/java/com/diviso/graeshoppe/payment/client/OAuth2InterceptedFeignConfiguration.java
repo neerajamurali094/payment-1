@@ -8,6 +8,8 @@ import feign.RequestInterceptor;
 
 import com.diviso.graeshoppe.payment.security.oauth2.AuthorizationHeaderUtil;
 
+
+
 public class OAuth2InterceptedFeignConfiguration {
 
     @Bean(name = "oauth2RequestInterceptor")

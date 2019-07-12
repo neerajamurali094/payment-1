@@ -24,8 +24,8 @@ eureka:
         prefer-ip-address: true
     client:
         service-url:
-            defaultZone: http://admin:${jhipster.registry.password}@localhost:8761/eureka/
-
+            defaultZone: https://admin:${jhipster.registry.password}@byta-tech.herokuapp.com/eureka/
+        
 spring:
     profiles:
         active: dev
@@ -53,8 +53,8 @@ spring:
     datasource:
         type: com.zaxxer.hikari.HikariDataSource
         url: jdbc:mysql://localhost:3306/payment?useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC
-        username: root
-        password:
+        username: user
+        password: password
         hikari:
             poolName: Hikari
             auto-commit: false
@@ -79,9 +79,15 @@ spring:
             hibernate.cache.hazelcast.use_lite_member: true
     data:
         elasticsearch:
-            properties:
-                path:
-                    home: target/elasticsearch
+           cluster-name: elasticsearch
+           cluster-nodes: http://34.68.17.132:9200
+           properties:
+               path:
+                   logs: target/elasticsearch/log
+                   data: target/elasticsearch/data
+        jest:
+           readTimeout: 10000
+           uri: http://34.68.17.132:9200
     liquibase:
         contexts: dev
     mail:
