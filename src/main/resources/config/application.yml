@@ -150,13 +150,13 @@ spring:
 security:
   oauth2:
     client:
-      access-token-uri: http://35.196.86.249:8080/auth/realms/graeshoppe/protocol/openid-connect/token
-      user-authorization-uri: http://35.196.86.249:8080/auth/realms/graeshoppe/protocol/openid-connect/auth
+      access-token-uri: http://35.196.86.249:8080/auth/realms/ayoos/protocol/openid-connect/token
+      user-authorization-uri: http://35.196.86.249:8080/auth/realms/ayoos/protocol/openid-connect/auth
       client-id: account
-      client-secret: 29a095bc-9ced-480b-a719-4e70ce7dcc49
+      client-secret: 622ccedd-b819-4512-8e43-ee9837088a48
       scope: openid profile email
     resource:
-      user-info-uri: http://35.196.86.249:8080/auth/realms/graeshoppe/protocol/openid-connect/userinfo
+      user-info-uri: http://35.196.86.249:8080/auth/realms/ayoos/protocol/openid-connect/userinfo
     paypal:
       access-token-uri: https://api.sandbox.paypal.com/v1/oauth2/token   
       client-id: AT-ve5Q8n8igYEs1o_kWoVNY2DLKCam50aILd3f61qhuweZdvAr-iPDw83vNWhLWpcITvR-rWsOmZDTt
