@@ -11,7 +11,7 @@
 # ===================================================================
 # Standard Spring Boot properties.
 # Full reference is available at:
-# http://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html
+# http://docs.spring.io/spring-boot/docs/current0 /reference/html/common-application-properties.html
 # ===================================================================
 
 eureka:
@@ -150,13 +150,13 @@ spring:
 security:
   oauth2:
     client:
-      access-token-uri: http://35.196.86.249:8080/auth/realms/ayoos/protocol/openid-connect/token
-      user-authorization-uri: http://35.196.86.249:8080/auth/realms/ayoos/protocol/openid-connect/auth
+      access-token-uri: http://dev.servers.divisosofttech.com:8888/auth/realms/graeshoppe/protocol/openid-connect/token
+      user-authorization-uri: http://dev.servers.divisosofttech.com:8888/auth/realms/graeshoppe/protocol/openid-connect/auth
       client-id: account
-      client-secret: 622ccedd-b819-4512-8e43-ee9837088a48
+      client-secret: 61aed705-1f70-4955-ad23-94bc15c09c29
       scope: openid profile email
     resource:
-      user-info-uri: http://35.196.86.249:8080/auth/realms/ayoos/protocol/openid-connect/userinfo
+      user-info-uri: http://dev.servers.divisosofttech.com:8888/auth/realms/graeshoppe/protocol/openid-connect/userinfo
     paypal:
       access-token-uri: https://api.sandbox.paypal.com/v1/oauth2/token   
       client-id: AT-ve5Q8n8igYEs1o_kWoVNY2DLKCam50aILd3f61qhuweZdvAr-iPDw83vNWhLWpcITvR-rWsOmZDTt
@@ -217,7 +217,12 @@ jhipster:
 # ===================================================================
 
 # application:
-
+bpmn:
+   url: http://dev.servers.divisosofttech.com:8080/activiti-rest/service
+   security:
+      basicAuth:
+         username: kermit
+         password: kermit
 razorPay:
    security:
       basicAuth:
