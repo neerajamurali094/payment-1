@@ -10,7 +10,9 @@ import feign.RequestInterceptor;
 import org.springframework.security.oauth2.client.DefaultOAuth2ClientContext;
 import org.springframework.security.oauth2.client.token.grant.client.ClientCredentialsResourceDetails;
 
+import com.diviso.graeshoppe.payment.client.ExcludeFromComponentScan;
 
+@ExcludeFromComponentScan
 @Configuration
 public class ClientConfiguration {
 

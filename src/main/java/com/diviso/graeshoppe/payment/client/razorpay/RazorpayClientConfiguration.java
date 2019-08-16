@@ -4,10 +4,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import com.diviso.graeshoppe.payment.client.ExcludeFromComponentScan;
+
 import feign.Logger;
 import feign.auth.BasicAuthRequestInterceptor;
 
 @Configuration
+@ExcludeFromComponentScan
 public class RazorpayClientConfiguration {
 
 	@Value("${razorPay.security.basicAuth.key}")
