@@ -5,6 +5,7 @@ import com.diviso.graeshoppe.payment.client.bpmn.api.FormsApi;
 import com.diviso.graeshoppe.payment.client.bpmn.api.TasksApi;
 import com.diviso.graeshoppe.payment.client.bpmn.model.RestFormProperty;
 import com.diviso.graeshoppe.payment.client.bpmn.model.SubmitFormRequest;
+import com.diviso.graeshoppe.payment.config.MessageBinderConfiguration;
 import com.diviso.graeshoppe.payment.domain.Payment;
 import com.diviso.graeshoppe.payment.model.ProcessPaymentRequest;
 import com.diviso.graeshoppe.payment.repository.PaymentRepository;
@@ -18,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.integration.support.MessageBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,13 +48,16 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentRepository paymentRepository;
 
     private final PaymentMapper paymentMapper;
+    
+    private final MessageBinderConfiguration messageChannel;
 
     private final PaymentSearchRepository paymentSearchRepository;
 
-    public PaymentServiceImpl(PaymentRepository paymentRepository, PaymentMapper paymentMapper, PaymentSearchRepository paymentSearchRepository) {
+    public PaymentServiceImpl(PaymentRepository paymentRepository, PaymentMapper paymentMapper, PaymentSearchRepository paymentSearchRepository,MessageBinderConfiguration messageChannel) {
         this.paymentRepository = paymentRepository;
         this.paymentMapper = paymentMapper;
         this.paymentSearchRepository = paymentSearchRepository;
+        this.messageChannel=messageChannel;
     }
 
     /**
@@ -68,9 +73,28 @@ public class PaymentServiceImpl implements PaymentService {
         payment = paymentRepository.save(payment);
         PaymentDTO result = paymentMapper.toDto(payment);
         paymentSearchRepository.save(payment);
+        boolean status=publishPaymentToKafka(result);
+        log.info("Message delivery status to kafka "+status);
         return result;
     }
 
+   public boolean publishPaymentToKafka(PaymentDTO paymentDTO){
+    	com.diviso.graeshoppe.payment.avro.Payment payment= com.diviso.graeshoppe.payment.avro.Payment
+    			.newBuilder()
+    			.setRef(paymentDTO.getRef())
+    			.setPayee(paymentDTO.getPayee())
+    			.setPayer(paymentDTO.getPayer())
+    			.setAmount(paymentDTO.getAmount())
+    			.setPaymentType(paymentDTO.getPaymentType())
+    			.setProvider(paymentDTO.getProvider())
+    			.setStatus(paymentDTO.getStatus())
+    			.setTargetId(paymentDTO.getTargetId())
+    			.setTax(paymentDTO.getTax())
+    			.setTotal(paymentDTO.getTotal())
+				.setDateAndTime(/* paymentDTO.getDateAndTime().getEpochSecond() */1000l).build();
+    	return messageChannel.paymentOut().send(MessageBuilder.withPayload(payment).build());
+    }
+    
     /**
      * Get all the payments.
      *
