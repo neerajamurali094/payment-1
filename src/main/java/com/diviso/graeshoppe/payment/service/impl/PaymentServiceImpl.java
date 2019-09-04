@@ -23,6 +23,7 @@ import org.springframework.integration.support.MessageBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -68,6 +69,7 @@ public class PaymentServiceImpl implements PaymentService {
      */
     @Override
     public PaymentDTO save(PaymentDTO paymentDTO) {
+    	paymentDTO.setDateAndTime(Instant.now());
         log.debug("Request to save Payment : {}", paymentDTO);
         Payment payment = paymentMapper.toEntity(paymentDTO);
         payment = paymentRepository.save(payment);
@@ -91,7 +93,7 @@ public class PaymentServiceImpl implements PaymentService {
     			.setTargetId(paymentDTO.getTargetId())
     			.setTax(paymentDTO.getTax())
     			.setTotal(paymentDTO.getTotal())
-				.setDateAndTime(/* paymentDTO.getDateAndTime().getEpochSecond() */1000l).build();
+				.setDateAndTime(paymentDTO.getDateAndTime().getEpochSecond()).build();
     	return messageChannel.paymentOut().send(MessageBuilder.withPayload(payment).build());
     }
     
