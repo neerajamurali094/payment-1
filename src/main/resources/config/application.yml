@@ -228,3 +228,8 @@ razorPay:
       basicAuth:
          key: rzp_test_nYbfvOn43G0awI
          secret: aiiM87vkbRSyG9Ptlom9fGjo
+braintree:
+   merchantId: 5nmr8r4nbybmdmx9
+   publicKey: kcvvkpxg7zpk6g42
+   privateKey: 0891247da7e5adc1a259646835135188
+   environment: sandbox

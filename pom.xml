@@ -11,7 +11,7 @@
 	<name>Payment</name>
 
 	<repositories>
-	<repository>
+		<repository>
 			<id>confluent</id>
 			<url>http://packages.confluent.io/maven/</url>
 			<releases>
@@ -126,6 +126,11 @@
 	</dependencyManagement>
 
 	<dependencies>
+		<dependency>
+			<groupId>com.braintreepayments.gateway</groupId>
+			<artifactId>braintree-java</artifactId>
+			<version>2.103.0</version>
+		</dependency>
 		<dependency>
 			<groupId>com.razorpay</groupId>
 			<artifactId>razorpay-java</artifactId>
@@ -399,13 +404,13 @@
 			<artifactId>spring-cloud-stream-test-support</artifactId>
 			<scope>test</scope>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.apache.avro</groupId>
 			<artifactId>avro</artifactId>
 			<version>${avro.version}</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.zalando</groupId>
 			<artifactId>problem-spring-web</artifactId>
@@ -486,7 +491,7 @@
 	<build>
 		<defaultGoal>spring-boot:run</defaultGoal>
 		<plugins>
-		<plugin>
+			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>build-helper-maven-plugin</artifactId>
 				<executions>
@@ -1106,25 +1111,25 @@
 							<configuration>
 								<lifecycleMappingMetadata>
 									<pluginExecutions>
-									<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>
-											org.apache.avro
-										</groupId>
-										<artifactId>
-											avro-maven-plugin
-										</artifactId>
-										<versionRange>
-											[1.8.2,)
-										</versionRange>
-										<goals>
-											<goal>schema</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<ignore></ignore>
-									</action>
-								</pluginExecution>
+										<pluginExecution>
+											<pluginExecutionFilter>
+												<groupId>
+													org.apache.avro
+												</groupId>
+												<artifactId>
+													avro-maven-plugin
+												</artifactId>
+												<versionRange>
+													[1.8.2,)
+												</versionRange>
+												<goals>
+													<goal>schema</goal>
+												</goals>
+											</pluginExecutionFilter>
+											<action>
+												<ignore></ignore>
+											</action>
+										</pluginExecution>
 										<pluginExecution>
 											<pluginExecutionFilter>
 												<groupId>org.jacoco</groupId>
