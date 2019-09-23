@@ -1,4 +1,4 @@
-package com.diviso.graeshoppe.payment.config;
+package com.diviso.graeshoppe.payment.client.braintree.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -19,19 +19,17 @@ public class BraintreeConfiguration {
 	@Value("${braintree.environment}")
 	private String environment;
 
-	@SuppressWarnings({ "unlikely-arg-type", "null" })
 	@Bean
 	public BraintreeGateway getBraintreeGateway() {
-		Environment environment = null;
+		Environment environ = null;
 		if (environment.equals("sandbox")) {
-			environment = Environment.SANDBOX;
+			environ = Environment.SANDBOX;
 		} else if (environment.equals("development")) {
-			environment = Environment.DEVELOPMENT;
+			environ = Environment.DEVELOPMENT;
 		} else if (environment.equals("production")) {
-			environment = Environment.PRODUCTION;
+			environ = Environment.PRODUCTION;
 		}
-
-		BraintreeGateway gateway = new BraintreeGateway(environment, merchantId, publicKey, privateKey);
+		BraintreeGateway gateway = new BraintreeGateway(environ, merchantId, publicKey, privateKey);
 		return gateway;
 	}
 }
