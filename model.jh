@@ -11,6 +11,17 @@ entity Payment{
 	status String,
 	dateAndTime Instant
 }
+
+entity Notification{
+	title String,
+	message String,
+	targetId String,
+	type String,
+	image ImageBlob,
+	date Instant,
+	receiverId String,
+	status String
+}
 service all with serviceImpl
 dto all with mapstruct
 paginate all with pagination

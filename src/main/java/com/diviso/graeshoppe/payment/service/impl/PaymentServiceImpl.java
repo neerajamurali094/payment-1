@@ -1,5 +1,6 @@
 package com.diviso.graeshoppe.payment.service.impl;
 
+import com.diviso.graeshoppe.payment.service.NotificationService;
 import com.diviso.graeshoppe.payment.service.PaymentService;
 import com.diviso.graeshoppe.payment.client.bpmn.api.FormsApi;
 import com.diviso.graeshoppe.payment.client.bpmn.api.TasksApi;
@@ -12,6 +13,7 @@ import com.diviso.graeshoppe.payment.repository.PaymentRepository;
 import com.diviso.graeshoppe.payment.repository.search.PaymentSearchRepository;
 import com.diviso.graeshoppe.payment.resource.CommandResource;
 import com.diviso.graeshoppe.payment.resource.assembler.ResourceAssembler;
+import com.diviso.graeshoppe.payment.service.dto.NotificationDTO;
 import com.diviso.graeshoppe.payment.service.dto.PaymentDTO;
 import com.diviso.graeshoppe.payment.service.mapper.PaymentMapper;
 import org.slf4j.Logger;
@@ -24,6 +26,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -37,121 +41,127 @@ import static org.elasticsearch.index.query.QueryBuilders.*;
 @Transactional
 public class PaymentServiceImpl implements PaymentService {
 
-    private final Logger log = LoggerFactory.getLogger(PaymentServiceImpl.class);
+	private final Logger log = LoggerFactory.getLogger(PaymentServiceImpl.class);
 
-    @Autowired
-    private TasksApi tasksApi;
-    @Autowired
-    private FormsApi formsApi;
-    
-    @Autowired
-    private ResourceAssembler resourceAssembler;
-    private final PaymentRepository paymentRepository;
+	@Autowired
+	private TasksApi tasksApi;
+	@Autowired
+	private FormsApi formsApi;
 
-    private final PaymentMapper paymentMapper;
-    
-    private final MessageBinderConfiguration messageChannel;
+	@Autowired
+	private ResourceAssembler resourceAssembler;
+	private final PaymentRepository paymentRepository;
 
-    private final PaymentSearchRepository paymentSearchRepository;
+	private final PaymentMapper paymentMapper;
 
-    public PaymentServiceImpl(PaymentRepository paymentRepository, PaymentMapper paymentMapper, PaymentSearchRepository paymentSearchRepository,MessageBinderConfiguration messageChannel) {
-        this.paymentRepository = paymentRepository;
-        this.paymentMapper = paymentMapper;
-        this.paymentSearchRepository = paymentSearchRepository;
-        this.messageChannel=messageChannel;
-    }
+	@Autowired
+	private NotificationService notificationService;
 
-    /**
-     * Save a payment.
-     *
-     * @param paymentDTO the entity to save
-     * @return the persisted entity
-     */
-    @Override
-    public PaymentDTO save(PaymentDTO paymentDTO) {
-    	paymentDTO.setDateAndTime(Instant.now());
-        log.debug("Request to save Payment : {}", paymentDTO);
-        Payment payment = paymentMapper.toEntity(paymentDTO);
-        payment = paymentRepository.save(payment);
-        PaymentDTO result = paymentMapper.toDto(payment);
-        paymentSearchRepository.save(payment);
-        boolean status=publishPaymentToKafka(result);
-        log.info("Message delivery status to kafka "+status);
-        return result;
-    }
+	private final MessageBinderConfiguration messageChannel;
 
-   public boolean publishPaymentToKafka(PaymentDTO paymentDTO){
-    	com.diviso.graeshoppe.payment.avro.Payment payment= com.diviso.graeshoppe.payment.avro.Payment
-    			.newBuilder()
-    			.setRef(paymentDTO.getRef())
-    			.setPayee(paymentDTO.getPayee())
-    			.setPayer(paymentDTO.getPayer())
-    			.setAmount(paymentDTO.getAmount())
-    			.setPaymentType(paymentDTO.getPaymentType())
-    			.setProvider(paymentDTO.getProvider())
-    			.setStatus(paymentDTO.getStatus())
-    			.setTargetId(paymentDTO.getTargetId())
-    			.setTax(paymentDTO.getTax())
-    			.setTotal(paymentDTO.getTotal())
+	private final PaymentSearchRepository paymentSearchRepository;
+
+	public PaymentServiceImpl(PaymentRepository paymentRepository, PaymentMapper paymentMapper,
+			PaymentSearchRepository paymentSearchRepository, MessageBinderConfiguration messageChannel) {
+		this.paymentRepository = paymentRepository;
+		this.paymentMapper = paymentMapper;
+		this.paymentSearchRepository = paymentSearchRepository;
+		this.messageChannel = messageChannel;
+	}
+
+	/**
+	 * Save a payment.
+	 *
+	 * @param paymentDTO the entity to save
+	 * @return the persisted entity
+	 */
+	@Override
+	public PaymentDTO save(PaymentDTO paymentDTO) {
+		paymentDTO.setDateAndTime(Instant.now());
+		log.debug("Request to save Payment : {}", paymentDTO);
+		Payment payment = paymentMapper.toEntity(paymentDTO);
+		payment = paymentRepository.save(payment);
+		PaymentDTO result = paymentMapper.toDto(payment);
+		paymentSearchRepository.save(payment);
+		boolean status = publishPaymentToKafka(result);
+		log.info("Message delivery status to kafka " + status);
+		sendNotification(result);
+		return result;
+	}
+
+	private void sendNotification(PaymentDTO paymentDTO) {
+		NotificationDTO notificationDTO = new NotificationDTO();
+		notificationDTO.setDate(Instant.now());
+		notificationDTO.setMessage("Congrats a new order is confirmed");
+		notificationDTO.setTitle("Order Confirmed");
+		notificationDTO.setTargetId(paymentDTO.getTargetId());
+		notificationDTO.setType("PaymenProcessed");
+		notificationDTO.setStatus("unread");
+		notificationDTO.setReceiverId(paymentDTO.getPayer());
+		notificationService.save(notificationDTO);
+	}
+
+	public boolean publishPaymentToKafka(PaymentDTO paymentDTO) {
+		com.diviso.graeshoppe.payment.avro.Payment payment = com.diviso.graeshoppe.payment.avro.Payment.newBuilder()
+				.setRef(paymentDTO.getRef()).setPayee(paymentDTO.getPayee()).setPayer(paymentDTO.getPayer())
+				.setAmount(paymentDTO.getAmount()).setPaymentType(paymentDTO.getPaymentType())
+				.setProvider(paymentDTO.getProvider()).setStatus(paymentDTO.getStatus())
+				.setTargetId(paymentDTO.getTargetId()).setTax(paymentDTO.getTax()).setTotal(paymentDTO.getTotal())
 				.setDateAndTime(paymentDTO.getDateAndTime().getEpochSecond()).build();
-    	return messageChannel.paymentOut().send(MessageBuilder.withPayload(payment).build());
-    }
-    
-    /**
-     * Get all the payments.
-     *
-     * @param pageable the pagination information
-     * @return the list of entities
-     */
-    @Override
-    @Transactional(readOnly = true)
-    public Page<PaymentDTO> findAll(Pageable pageable) {
-        log.debug("Request to get all Payments");
-        return paymentRepository.findAll(pageable)
-            .map(paymentMapper::toDto);
-    }
+		return messageChannel.paymentOut().send(MessageBuilder.withPayload(payment).build());
+	}
 
+	/**
+	 * Get all the payments.
+	 *
+	 * @param pageable the pagination information
+	 * @return the list of entities
+	 */
+	@Override
+	@Transactional(readOnly = true)
+	public Page<PaymentDTO> findAll(Pageable pageable) {
+		log.debug("Request to get all Payments");
+		return paymentRepository.findAll(pageable).map(paymentMapper::toDto);
+	}
 
-    /**
-     * Get one payment by id.
-     *
-     * @param id the id of the entity
-     * @return the entity
-     */
-    @Override
-    @Transactional(readOnly = true)
-    public Optional<PaymentDTO> findOne(Long id) {
-        log.debug("Request to get Payment : {}", id);
-        return paymentRepository.findById(id)
-            .map(paymentMapper::toDto);
-    }
+	/**
+	 * Get one payment by id.
+	 *
+	 * @param id the id of the entity
+	 * @return the entity
+	 */
+	@Override
+	@Transactional(readOnly = true)
+	public Optional<PaymentDTO> findOne(Long id) {
+		log.debug("Request to get Payment : {}", id);
+		return paymentRepository.findById(id).map(paymentMapper::toDto);
+	}
 
-    /**
-     * Delete the payment by id.
-     *
-     * @param id the id of the entity
-     */
-    @Override
-    public void delete(Long id) {
-        log.debug("Request to delete Payment : {}", id);
-        paymentRepository.deleteById(id);
-        paymentSearchRepository.deleteById(id);
-    }
+	/**
+	 * Delete the payment by id.
+	 *
+	 * @param id the id of the entity
+	 */
+	@Override
+	public void delete(Long id) {
+		log.debug("Request to delete Payment : {}", id);
+		paymentRepository.deleteById(id);
+		paymentSearchRepository.deleteById(id);
+	}
 
-    /**
-     * Search for the payment corresponding to the query.
-     *
-     * @param query the query of the search
-     * @param pageable the pagination information
-     * @return the list of entities
-     */
-    @Override
-    @Transactional(readOnly = true)
-    public Page<PaymentDTO> search(String query, Pageable pageable) {
-        log.debug("Request to search for a page of Payments for query {}", query);
-        return paymentSearchRepository.search(queryStringQuery(query), pageable)
-            .map(paymentMapper::toDto);
-    }
+	/**
+	 * Search for the payment corresponding to the query.
+	 *
+	 * @param query    the query of the search
+	 * @param pageable the pagination information
+	 * @return the list of entities
+	 */
+	@Override
+	@Transactional(readOnly = true)
+	public Page<PaymentDTO> search(String query, Pageable pageable) {
+		log.debug("Request to search for a page of Payments for query {}", query);
+		return paymentSearchRepository.search(queryStringQuery(query), pageable).map(paymentMapper::toDto);
+	}
 
 	@Override
 	public CommandResource processPayment(ProcessPaymentRequest processPaymentRequest) {

@@ -9,4 +9,10 @@ public interface MessageBinderConfiguration {
 	
 	@Output(PAYMENT)
 	MessageChannel paymentOut();
+	
+
+	String NOTIFICATION="notification";
+	
+	@Output(NOTIFICATION)
+	MessageChannel notificationOut();
 }
