@@ -1,6 +1,6 @@
  
 	{
-	"namespace":"com.diviso.graeshoppe.payment.avro",
+	"namespace":"com.diviso.graeshoppe.notification.avro",
 	"type":"record",
 	"name":"Notificaton",
 	"fields":[
