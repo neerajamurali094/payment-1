@@ -97,7 +97,7 @@ public class PaymentServiceImpl implements PaymentService {
 		notificationDTO.setTargetId(paymentDTO.getTargetId());
 		notificationDTO.setType("PaymenProcessed");
 		notificationDTO.setStatus("unread");
-		notificationDTO.setReceiverId(paymentDTO.getPayer());
+		notificationDTO.setReceiverId(paymentDTO.getPayee());
 		notificationService.save(notificationDTO);
 	}
 
