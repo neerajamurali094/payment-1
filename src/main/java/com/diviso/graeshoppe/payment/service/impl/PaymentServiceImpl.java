@@ -99,6 +99,8 @@ public class PaymentServiceImpl implements PaymentService {
 		notificationDTO.setStatus("unread");
 		notificationDTO.setReceiverId(paymentDTO.getPayee());
 		notificationService.save(notificationDTO);
+		Boolean status =notificationService.publishNotificationToMessageBroker(notificationDTO);
+        log.info("Notification send to MOM status is "+status);
 	}
 
 	public boolean publishPaymentToKafka(PaymentDTO paymentDTO) {

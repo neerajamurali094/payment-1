@@ -12,6 +12,7 @@ import java.util.Optional;
  */
 public interface NotificationService {
 
+	public Boolean publishNotificationToMessageBroker(NotificationDTO notification);
     /**
      * Save a notification.
      *

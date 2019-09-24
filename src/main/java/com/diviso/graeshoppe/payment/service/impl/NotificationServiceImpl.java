@@ -1,8 +1,8 @@
 package com.diviso.graeshoppe.payment.service.impl;
 
 import com.diviso.graeshoppe.payment.service.NotificationService;
-import com.diviso.graeshoppe.payment.avro.Notificaton;
-import com.diviso.graeshoppe.payment.avro.Notificaton.Builder;
+import com.diviso.graeshoppe.notification.avro.Notificaton;
+import com.diviso.graeshoppe.notification.avro.Notificaton.Builder;
 import com.diviso.graeshoppe.payment.config.MessageBinderConfiguration;
 import com.diviso.graeshoppe.payment.domain.Notification;
 import com.diviso.graeshoppe.payment.repository.NotificationRepository;
@@ -60,12 +60,11 @@ public class NotificationServiceImpl implements NotificationService {
         notification = notificationRepository.save(notification);
         NotificationDTO result = notificationMapper.toDto(notification);
         notificationSearchRepository.save(notification);
-        Boolean status =publishNotificationToMessageBroker(result);
-        log.info("Notification send to MOM status is "+status);
         return result;
     }
 
-    private Boolean publishNotificationToMessageBroker(NotificationDTO notification) {
+    @Override
+    public Boolean publishNotificationToMessageBroker(NotificationDTO notification) {
     	Builder messageBuilder =Notificaton.newBuilder()
     			.setDate(notification.getDate().toEpochMilli())
     			.setId(notification.getId())
