@@ -95,7 +95,7 @@ public class PaymentServiceImpl implements PaymentService {
 		notificationDTO.setMessage("Congrats a new order is confirmed");
 		notificationDTO.setTitle("Order Confirmed");
 		notificationDTO.setTargetId(paymentDTO.getTargetId());
-		notificationDTO.setType("PaymenProcessed");
+		notificationDTO.setType("Confirmed-Notification");
 		notificationDTO.setStatus("unread");
 		notificationDTO.setReceiverId(paymentDTO.getPayee());
 		NotificationDTO resultNotification=notificationService.save(notificationDTO);
