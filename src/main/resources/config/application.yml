@@ -218,7 +218,7 @@ jhipster:
 
 # application:
 bpmn:
-   url: http://dev.servers.divisosofttech.com:8080/activiti-rest/service
+   url: http://dev.servers.divisosofttech.com/activiti-rest/service
    security:
       basicAuth:
          username: kermit
