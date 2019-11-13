@@ -11,8 +11,6 @@ import com.diviso.graeshoppe.payment.client.bpmn.model.IOSpecification;
 import com.diviso.graeshoppe.payment.client.bpmn.model.Lane;
 import com.diviso.graeshoppe.payment.client.bpmn.model.ValuedDataObject;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 import org.springframework.validation.annotation.Validated;
 import javax.validation.Valid;
-import javax.validation.constraints.*;
 
 /**
  * Process

@@ -26,8 +26,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -90,17 +88,26 @@ public class PaymentServiceImpl implements PaymentService {
 	}
 
 	private void sendNotification(PaymentDTO paymentDTO) {
-		NotificationDTO notificationDTO = new NotificationDTO();
-		notificationDTO.setDate(Instant.now());
-		notificationDTO.setMessage("Congrats a new order is confirmed");
-		notificationDTO.setTitle("Order Confirmed");
-		notificationDTO.setTargetId(paymentDTO.getTargetId());
-		notificationDTO.setType("Confirmed-Notification");
-		notificationDTO.setStatus("unread");
-		notificationDTO.setReceiverId(paymentDTO.getPayee());
-		NotificationDTO resultNotification=notificationService.save(notificationDTO);
-		Boolean status =notificationService.publishNotificationToMessageBroker(resultNotification);
-        log.info("Notification send to MOM status is "+status);
+		NotificationDTO notificationToPayee = new NotificationDTO();
+		notificationToPayee.setDate(Instant.now());
+		notificationToPayee.setMessage("Congrats a new order is confirmed");
+		notificationToPayee.setTitle("Order Confirmed");
+		notificationToPayee.setTargetId(paymentDTO.getTargetId());
+		notificationToPayee.setType("Confirmed-Notification");
+		notificationToPayee.setStatus("unread");
+		notificationToPayee.setReceiverId(paymentDTO.getPayee());
+		NotificationDTO resultNotificationPayee=notificationService.save(notificationToPayee);
+		Boolean status =notificationService.publishNotificationToMessageBroker(resultNotificationPayee);
+		log.info("Message send to kafka status is "+status);
+		NotificationDTO notificationToPayer = new NotificationDTO();
+		notificationToPayer.setDate(Instant.now());
+		notificationToPayer.setMessage("Dear customer,Your Order Has been placed successfully!");
+		notificationToPayer.setTitle("Order Placed");
+		notificationToPayer.setTargetId(paymentDTO.getTargetId());
+		notificationToPayer.setType("Order-Placed");
+		notificationToPayer.setStatus("unread");
+		notificationToPayer.setReceiverId(paymentDTO.getPayer());
+		NotificationDTO resultNotificationPayer=notificationService.save(notificationToPayer);
 	}
 
 	public boolean publishPaymentToKafka(PaymentDTO paymentDTO) {

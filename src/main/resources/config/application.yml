@@ -226,8 +226,8 @@ bpmn:
 razorPay:
    security:
       basicAuth:
-         key: rzp_test_nYbfvOn43G0awI
-         secret: aiiM87vkbRSyG9Ptlom9fGjo
+         key: rzp_test_ZR203rhDh9RWHf
+         secret: 7wLOdFABdT3YP7lmBlxJpQ5c
 braintree:
    merchantId: 5nmr8r4nbybmdmx9
    publicKey: kcvvkpxg7zpk6g42
