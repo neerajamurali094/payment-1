@@ -112,6 +112,7 @@ public class PaymentServiceImpl implements PaymentService {
 
 	public boolean publishPaymentToKafka(PaymentDTO paymentDTO) {
 		com.diviso.graeshoppe.payment.avro.Payment payment = com.diviso.graeshoppe.payment.avro.Payment.newBuilder()
+				.setId(paymentDTO.getId())
 				.setRef(paymentDTO.getRef()).setPayee(paymentDTO.getPayee()).setPayer(paymentDTO.getPayer())
 				.setAmount(paymentDTO.getAmount()).setPaymentType(paymentDTO.getPaymentType())
 				.setProvider(paymentDTO.getProvider()).setStatus(paymentDTO.getStatus())
