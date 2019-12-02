@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.diviso.graeshoppe.payment.client.razorpay.api.RazorpayApi;
@@ -19,12 +20,18 @@ public class RazorpayCommandServiceImpl implements RazorpayCommandService {
 
 	@Autowired
 	private RazorpayApi razorPayApi;
+
+	@Value("${razorPay.security.basicAuth.key}")
+	private String razorPayKey;
+	
+	@Value("${razorPay.security.basicAuth.secret}")
+	private String razorPaySecret;
 	
 	@Override
 	public Optional<OrderResponse> createOrder(OrderRequest orderRequest) {
 		OrderResponse orderResponse=new OrderResponse();
 		 try {
-			RazorpayClient razorpayClient = new RazorpayClient("rzp_test_nYbfvOn43G0awI", "aiiM87vkbRSyG9Ptlom9fGjo");
+			RazorpayClient razorpayClient = new RazorpayClient(razorPayKey, razorPaySecret);
 				JSONObject request=new JSONObject();
 				request.put("amount", orderRequest.getAmount()); // Note: The amount should be in paise.
 				request.put("currency", orderRequest.getCurrency());
