@@ -90,10 +90,10 @@ public class PaymentServiceImpl implements PaymentService {
 	private void sendNotification(PaymentDTO paymentDTO) {
 		NotificationDTO notificationToPayee = new NotificationDTO();
 		notificationToPayee.setDate(Instant.now());
-		notificationToPayee.setMessage("Congrats a new order is confirmed");
+		notificationToPayee.setMessage("Congrats You've a new Order Request");
 		notificationToPayee.setTitle("Order Confirmed");
 		notificationToPayee.setTargetId(paymentDTO.getTargetId());
-		notificationToPayee.setType("Confirmed-Notification");
+		notificationToPayee.setType("Order-Request");
 		notificationToPayee.setStatus("unread");
 		notificationToPayee.setReceiverId(paymentDTO.getPayee());
 		NotificationDTO resultNotificationPayee=notificationService.save(notificationToPayee);

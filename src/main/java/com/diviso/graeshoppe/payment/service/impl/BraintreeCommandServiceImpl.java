@@ -13,6 +13,7 @@ import com.braintreegateway.TransactionRequest;
 import com.braintreegateway.ValidationError;
 import com.diviso.graeshoppe.payment.client.braintree.models.PaymentTransaction;
 import com.diviso.graeshoppe.payment.client.braintree.models.PaymentTransactionResponse;
+import com.diviso.graeshoppe.payment.client.braintree.models.RefundResponse;
 import com.diviso.graeshoppe.payment.service.BraintreeCommandService;
 
 @Service
@@ -55,6 +56,14 @@ public class BraintreeCommandServiceImpl implements BraintreeCommandService {
 
 		}
 		return paymentTransactionResponse;
+	}
+
+	@Override
+	public RefundResponse createRefund(String transactionId) {
+		Result<Transaction> result  = braintreeGateway.transaction().refund(transactionId);
+		RefundResponse refundResponse = new RefundResponse();
+		refundResponse.setTransactionId(result.getTransaction().getId());
+		return refundResponse;
 	}
 
 }

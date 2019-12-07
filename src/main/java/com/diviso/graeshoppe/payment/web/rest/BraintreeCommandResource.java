@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.diviso.graeshoppe.payment.client.braintree.models.PaymentTransaction;
 import com.diviso.graeshoppe.payment.client.braintree.models.PaymentTransactionResponse;
+import com.diviso.graeshoppe.payment.client.braintree.models.RefundResponse;
 import com.diviso.graeshoppe.payment.service.BraintreeCommandService;
 
 @RestController
@@ -30,5 +32,11 @@ public class BraintreeCommandResource {
 			@RequestBody PaymentTransaction paymentTransaction) {
 		PaymentTransactionResponse response = braintreeService.createTransaction(paymentTransaction);
 		return new ResponseEntity<PaymentTransactionResponse>(response, HttpStatus.OK);
+	}
+	
+	@PostMapping("/refunds/{transactionId}")
+	public ResponseEntity<RefundResponse> createRefund(@PathVariable String transactionId){
+		RefundResponse refundResponse = braintreeService.createRefund(transactionId);
+		return new ResponseEntity<RefundResponse>(refundResponse, HttpStatus.OK);
 	}
 }
