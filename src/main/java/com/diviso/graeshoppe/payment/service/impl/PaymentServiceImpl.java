@@ -91,7 +91,7 @@ public class PaymentServiceImpl implements PaymentService {
 		NotificationDTO notificationToPayee = new NotificationDTO();
 		notificationToPayee.setDate(Instant.now());
 		notificationToPayee.setMessage("Congrats You've a new Order Request");
-		notificationToPayee.setTitle("Order Confirmed");
+		notificationToPayee.setTitle("Order Request");
 		notificationToPayee.setTargetId(paymentDTO.getTargetId());
 		notificationToPayee.setType("Order-Request");
 		notificationToPayee.setStatus("unread");
@@ -107,6 +107,7 @@ public class PaymentServiceImpl implements PaymentService {
 		notificationToPayer.setType("Order-Placed");
 		notificationToPayer.setStatus("unread");
 		notificationToPayer.setReceiverId(paymentDTO.getPayer());
+		Boolean statusPayer  =notificationService.publishNotificationToMessageBroker(notificationToPayer);
 		NotificationDTO resultNotificationPayer=notificationService.save(notificationToPayer);
 	}
 
