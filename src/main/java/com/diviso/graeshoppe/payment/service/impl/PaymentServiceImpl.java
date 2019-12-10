@@ -107,8 +107,8 @@ public class PaymentServiceImpl implements PaymentService {
 		notificationToPayer.setType("Order-Placed");
 		notificationToPayer.setStatus("unread");
 		notificationToPayer.setReceiverId(paymentDTO.getPayer());
-		Boolean statusPayer  =notificationService.publishNotificationToMessageBroker(notificationToPayer);
 		NotificationDTO resultNotificationPayer=notificationService.save(notificationToPayer);
+		Boolean statusPayer  =notificationService.publishNotificationToMessageBroker(resultNotificationPayer);
 	}
 
 	public boolean publishPaymentToKafka(PaymentDTO paymentDTO) {
